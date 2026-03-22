@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Numeri pseudocasuali e Welford</title>
+</head>
+<body>
+
+<h1>Generatore di numeri pseudocasuali</h1>
+<p>Questo programma genera N numeri casuali e calcola media e varianza con la ricorrenza di Welford.</p>
+
+<label>Quanti numeri vuoi generare?</label><br>
+<input type="number" id="n" value="1000"><br><br>
+
+<label>Distribuzione:</label><br>
+<select id="dist">
+  <option value="uniforme">Uniforme [0,1]</option>
+  <option value="esponenziale">Esponenziale (lambda=1)</option>
+  <option value="normale">Normale (Box-Muller)</option>
+  <option value="chi2">Chi-quadrato (2 gradi di liberta)</option>
+  <option value="weibull">Weibull (lambda=1, alpha=2)</option>
+  <option value="binomiale">Binomiale (n=10, p=0.5)</option>
+</select><br><br>
+
+<button onclick="genera()">Genera e calcola</button>
+<button onclick="mostraPatologica()">Sequenza patologica (confronto naive vs Welford)</button>
+
+<hr>
+<h2>Risultati</h2>
+<p id="risultati"></p>
+
+<hr>
+<h2>Istogramma dei valori generati</h2>
+<canvas id="grafico" width="700" height="300" style="border:1px solid black;"></canvas>
+
+<hr>
+<h2>Sequenza patologica</h2>
+<p id="patologica"></p>
+
+<script src="pseudocasuali.js"></script>
+</body>
+</html>
