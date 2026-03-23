@@ -1,6 +1,6 @@
 # uniform-to-distributions-demo
 
-Homework di Statistica Applicata — Debora Siri, matricola 1921846
+Homework 2 di Statistica Applicata — Debora Siri, matricola 1921846
 
 ## Descrizione
 
