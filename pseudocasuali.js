@@ -1,185 +1,97 @@
-// -----------------------------------------------
-// GENERATORI DI DISTRIBUZIONI
-// -----------------------------------------------
+// genera numeri da diverse distribuzioni partendo da U[0,1)
 
-function uniforme() {
-  return Math.random();
+function uniforme(n) {
+  let dati = [];
+  for (let i = 0; i < n; i++) dati.push(Math.random());
+  return dati;
 }
 
-function esponenziale(lambda) {
-  var u = Math.random();
-  return -Math.log(u) / lambda;
+function esponenziale(n, lambda) {
+  // inversione CDF: X = -log(U) / lambda
+  let dati = [];
+  for (let i = 0; i < n; i++) dati.push(-Math.log(Math.random()) / lambda);
+  return dati;
 }
 
-function normale() {
-  // Formula di Box-Muller
-  var u = Math.random();
-  var v = Math.random();
-  var x = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-  return x;
-}
-
-function chi2() {
-  // Chi-quadrato con 2 gradi di liberta = esponenziale con lambda = 0.5
-  var u = Math.random();
-  return -2 * Math.log(u);
-}
-
-function weibull(lambda, alpha) {
-  var u = Math.random();
-  return Math.pow(-Math.log(u) / lambda, 1 / alpha);
-}
-
-function binomiale(n, p) {
-  var x = 0;
-  for (var i = 0; i < n; i++) {
-    if (Math.random() < p) {
-      x = x + 1;
-    }
+function normale(n) {
+  // Box-Muller
+  let dati = [];
+  for (let i = 0; i < n; i++) {
+    let u = Math.random(), v = Math.random();
+    dati.push(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v));
   }
-  return x;
+  return dati;
 }
 
-// -----------------------------------------------
-// RICORRENZA DI WELFORD
-// Calcola media e varianza senza salvare tutti i valori
-// -----------------------------------------------
+function chiQuadro(n) {
+  // chi-quadro con 2 gradi di liberta: X = -2*log(U)
+  let dati = [];
+  for (let i = 0; i < n; i++) dati.push(-2 * Math.log(Math.random()));
+  return dati;
+}
 
-function welford(valori) {
-  var n = 0;
-  var media = 0;
-  var M2 = 0;
+function weibull(n, lambda, alpha) {
+  // inversione CDF: X = (-log(U) / lambda)^(1/alpha)
+  let dati = [];
+  for (let i = 0; i < n; i++) dati.push(Math.pow(-Math.log(Math.random()) / lambda, 1 / alpha));
+  return dati;
+}
 
-  for (var i = 0; i < valori.length; i++) {
-    var x = valori[i];
-    n = n + 1;
-    var delta = x - media;
-    media = media + delta / n;
-    var delta2 = x - media;
-    M2 = M2 + delta * delta2;
+function welford(dati) {
+  let count = 0, media = 0, M2 = 0;
+  for (let x of dati) {
+    count++;
+    let delta = x - media;
+    media += delta / count;
+    M2 += delta * (x - media);
   }
-
-  var varianza = M2 / (n - 1);
-  return { media: media, varianza: varianza };
+  return { media: media.toFixed(4), varianza: (M2 / (count - 1)).toFixed(4) };
 }
 
-// -----------------------------------------------
-// FORMULA NAIVE 
-// varianza = (somma x^2 - n * media^2) / (n-1)
-// -----------------------------------------------
-
-function naive(valori) {
-  var n = valori.length;
-  var somma = 0;
-  var sommaQuadrati = 0;
-
-  for (var i = 0; i < n; i++) {
-    somma = somma + valori[i];
-    sommaQuadrati = sommaQuadrati + valori[i] * valori[i];
-  }
-
-  var media = somma / n;
-  var varianza = (sommaQuadrati - n * media * media) / (n - 1);
-  return { media: media, varianza: varianza };
-}
-
-// -----------------------------------------------
-// GENERA I NUMERI E MOSTRA I RISULTATI
-// -----------------------------------------------
-
-function genera() {
-  var n = parseInt(document.getElementById("n").value);
-  var dist = document.getElementById("dist").value;
-  var valori = [];
-
-  for (var i = 0; i < n; i++) {
-    var val;
-    if (dist === "uniforme")      val = uniforme();
-    if (dist === "esponenziale")  val = esponenziale(1);
-    if (dist === "normale")       val = normale();
-    if (dist === "chi2")          val = chi2();
-    if (dist === "weibull")       val = weibull(1, 2);
-    if (dist === "binomiale")     val = binomiale(10, 0.5);
-    valori.push(val);
-  }
-
-  var ris = welford(valori);
-
-  var testo = "";
-  testo += "Distribuzione: " + dist + "<br>";
-  testo += "Numeri generati: " + n + "<br>";
-  testo += "Media (Welford): " + ris.media.toFixed(6) + "<br>";
-  testo += "Varianza (Welford): " + ris.varianza.toFixed(6) + "<br>";
-
-  document.getElementById("risultati").innerHTML = testo;
-
-  disegnaIstogramma(valori);
-}
-
-// -----------------------------------------------
-// ISTOGRAMMA
-// -----------------------------------------------
-
-function disegnaIstogramma(valori) {
-  var canvas = document.getElementById("grafico");
-  var ctx = canvas.getContext("2d");
+function istogramma(dati, canvas, colore) {
+  let ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  var min = valori[0];
-  var max = valori[0];
-  for (var i = 0; i < valori.length; i++) {
-    if (valori[i] < min) min = valori[i];
-    if (valori[i] > max) max = valori[i];
+  let min = Math.min(...dati);
+  let max = Math.max(...dati);
+  let bins = 30;
+  let cont = new Array(bins).fill(0);
+
+  for (let x of dati) {
+    let i = Math.min(Math.floor((x - min) / (max - min) * bins), bins - 1);
+    cont[i]++;
   }
 
-  var numBarre = 30;
-  var conteggi = [];
-  for (var i = 0; i < numBarre; i++) conteggi.push(0);
+  let maxC = Math.max(...cont);
+  let w = canvas.width / bins;
 
-  for (var i = 0; i < valori.length; i++) {
-    var idx = Math.floor((valori[i] - min) / (max - min) * numBarre);
-    if (idx === numBarre) idx = numBarre - 1;
-    conteggi[idx]++;
-  }
-
-  var massimo = 0;
-  for (var i = 0; i < conteggi.length; i++) {
-    if (conteggi[i] > massimo) massimo = conteggi[i];
-  }
-
-  var larghezzaBarra = canvas.width / numBarre;
-  for (var i = 0; i < numBarre; i++) {
-    var altezza = (conteggi[i] / massimo) * (canvas.height - 20);
-    ctx.fillStyle = "steelblue";
-    ctx.fillRect(i * larghezzaBarra, canvas.height - altezza, larghezzaBarra - 2, altezza);
+  ctx.fillStyle = colore;
+  for (let i = 0; i < bins; i++) {
+    let h = (cont[i] / maxC) * (canvas.height - 10);
+    ctx.fillRect(i * w + 1, canvas.height - h, w - 2, h);
   }
 }
 
-// -----------------------------------------------
-// SEQUENZA PATOLOGICA
-// -----------------------------------------------
+function aggiorna() {
+  let tipo = document.getElementById("tipo").value;
+  let n = parseInt(document.getElementById("n").value);
 
-function mostraPatologica() {
-  var valori = [];
-  var base = 1e8; // cento milioni
-  for (var i = 0; i < 1000; i++) {
-    valori.push(base + Math.random()); // numeri tipo 100000000.xxxx
-  }
+  let input = uniforme(n);
+  let output;
 
-  var risNaive   = naive(valori);
-  var risWelford = welford(valori);
+  if (tipo === "esponenziale") output = esponenziale(n, 1);
+  else if (tipo === "normale")  output = normale(n);
+  else if (tipo === "chiquadro") output = chiQuadro(n);
+  else if (tipo === "weibull")  output = weibull(n, 1, 2);
 
-  var varianzaVera = 1 / 12;
+  let wi = welford(input);
+  let wo = welford(output);
 
-  var testo = "";
-  testo += "Valori generati: 1000 numeri tipo 100.000.000 + uniforme[0,1]<br>";
-  testo += "Varianza vera attesa: " + varianzaVera.toFixed(8) + "<br><br>";
-  testo += "<b>Formula naive</b><br>";
-  testo += "Media: " + risNaive.media.toFixed(8) + "<br>";
-  testo += "Varianza: " + risNaive.varianza.toFixed(8) + " &larr; puo' essere imprecisa o negativa!<br><br>";
-  testo += "<b>Ricorrenza di Welford</b><br>";
-  testo += "Media: " + risWelford.media.toFixed(8) + "<br>";
-  testo += "Varianza: " + risWelford.varianza.toFixed(8) + " &larr; risultato corretto<br>";
+  document.getElementById("info-input").textContent =
+    "media: " + wi.media + "   varianza: " + wi.varianza;
+  document.getElementById("info-output").textContent =
+    "media: " + wo.media + "   varianza: " + wo.varianza;
 
-  document.getElementById("patologica").innerHTML = testo;
+  istogramma(input,  document.getElementById("c-input"),  "#4a90d9");
+  istogramma(output, document.getElementById("c-output"), "#e07b3a");
 }
