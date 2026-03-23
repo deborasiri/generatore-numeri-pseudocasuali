@@ -1,42 +1,28 @@
-```
-# Generatore di numeri pseudocasuali
+# uniform-to-distributions-demo
 
-Applicazione web in JavaScript per la generazione di numeri pseudocasuali e l'analisi statistica dei dati generati.
+Homework di Statistica Applicata — Debora Siri, matricola 1921846
 
-## Funzionalità
+## Descrizione
 
-Distribuzioni disponibili:
-- Uniforme [0,1]
-- Esponenziale
-- Normale (Box-Muller)
-- Chi-quadrato (2 gradi di libertà)
-- Weibull
-- Binomiale
+Demo interattiva che genera numeri pseudocasuali a partire da una variabile uniforme U[0,1) e li trasforma nelle principali distribuzioni statistiche. Per ogni distribuzione vengono mostrati i due istogrammi (input e output) e calcolate media e varianza con la ricorrenza di Welford.
 
-Il programma calcola media e varianza usando la ricorrenza di Welford, più stabile numericamente rispetto alla formula classica.
+## Distribuzioni implementate
 
-È inclusa anche una sezione di confronto tra la formula naive e l'algoritmo di Welford su sequenze patologiche, per mostrare i problemi di cancellazione catastrofica.
+- **Esponenziale** — inversione CDF: `X = -log(U) / λ`
+- **Normale** — metodo di Box-Muller
+- **Chi-quadro (2gl)** — caso speciale: `X = -2·log(U)`
+- **Weibull** — inversione CDF: `X = (-log(U)/λ)^(1/α)`
 
-## Struttura del progetto
+## File
 
-- `index.html` — interfaccia utente
-- `pseudocasuali.js` — logica di generazione e calcolo statistico
+- `demo.html` — interfaccia
+- `demo.js` — logica di generazione e calcolo
 
-## Come eseguire
+## Come si usa
 
-Apri il link GitHub Pages del progetto:
-https://deborasiri.github.io/generatore-numeri-pseudocasuali
+**Online** — visitare direttamente:
+https://deborasiri.github.io/uniform-to-distributions-demo/
 
-Oppure scarica i file e apri `index.html` in locale nel browser.
+**In locale** — scaricare i file `demo.html` e `demo.js` nella stessa cartella e aprire `demo.html` nel browser.
 
-## Metodi utilizzati
-
-- Metodo di inversione (esponenziale, Weibull)
-- Formula di Box-Muller (normale)
-- Combinazione di variabili indicatrici (binomiale)
-- Ricorrenza di Welford per media e varianza
-
-## Autore
-
-Debora Siri
-```
+Scegliere la distribuzione, impostare n e cliccare Genera.
