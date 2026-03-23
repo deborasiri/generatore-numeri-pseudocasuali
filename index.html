@@ -2,41 +2,48 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Numeri pseudocasuali e Welford</title>
+  <title>Demo distribuzioni</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; max-width: 680px; }
+    canvas { border: 1px solid #ccc; display: block; margin-top: 6px; }
+    select, input { padding: 4px; margin-right: 10px; }
+    button { padding: 8px 16px; margin-top: 10px; cursor: pointer; }
+    h2 { font-size: 16px; margin-top: 22px; }
+    p { margin: 6px 0; font-size: 14px; }
+    .nota { color: #666; font-size: 13px; }
+  </style>
 </head>
 <body>
 
-<h1>Generatore di numeri pseudocasuali</h1>
-<p>Questo programma genera N numeri casuali e calcola media e varianza con la ricorrenza di Welford.</p>
+<h1>Generazione di distribuzioni da U[0,1)</h1>
 
-<label>Quanti numeri vuoi generare?</label><br>
-<input type="number" id="n" value="1000"><br><br>
+<label>Distribuzione output:
+  <select id="tipo">
+    <option value="esponenziale">Esponenziale (inversione CDF)</option>
+    <option value="normale">Normale (Box-Muller)</option>
+    <option value="chiquadro">Chi-quadro 2gl (inversione CDF)</option>
+    <option value="weibull">Weibull (inversione CDF)</option>
+  </select>
+</label>
+<label>n: <input type="number" id="n" value="1000" min="100"></label>
+<br>
+<button onclick="aggiorna()">Genera</button>
 
-<label>Distribuzione:</label><br>
-<select id="dist">
-  <option value="uniforme">Uniforme [0,1]</option>
-  <option value="esponenziale">Esponenziale (lambda=1)</option>
-  <option value="normale">Normale (Box-Muller)</option>
-  <option value="chi2">Chi-quadrato (2 gradi di liberta)</option>
-  <option value="weibull">Weibull (lambda=1, alpha=2)</option>
-  <option value="binomiale">Binomiale (n=10, p=0.5)</option>
-</select><br><br>
+<h2>Input — Uniforme U[0,1)</h2>
+<canvas id="c-input" width="640" height="160"></canvas>
+<p id="info-input"></p>
 
-<button onclick="genera()">Genera e calcola</button>
-<button onclick="mostraPatologica()">Sequenza patologica (confronto naive vs Welford)</button>
+<h2>Output — distribuzione trasformata</h2>
+<canvas id="c-output" width="640" height="160"></canvas>
+<p id="info-output"></p>
 
-<hr>
-<h2>Risultati</h2>
-<p id="risultati"></p>
+<p class="nota">
+  Esponenziale: X = -log(U) / λ &nbsp;|&nbsp;
+  Normale: Box-Muller &nbsp;|&nbsp;
+  Chi-quadro: X = -2·log(U) &nbsp;|&nbsp;
+  Weibull: X = (-log(U)/λ)<sup>1/α</sup>
+</p>
 
-<hr>
-<h2>Istogramma dei valori generati</h2>
-<canvas id="grafico" width="700" height="300" style="border:1px solid black;"></canvas>
-
-<hr>
-<h2>Sequenza patologica</h2>
-<p id="patologica"></p>
-
-<script src="pseudocasuali.js"></script>
+<script src="demo.js"></script>
 </body>
 </html>
