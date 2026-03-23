@@ -15,7 +15,7 @@ Demo interattiva che genera numeri pseudocasuali a partire da una variabile unif
 
 ## File
 
-- `demo.html` — interfaccia
+- `index.html` — interfaccia
 - `demo.js` — logica di generazione e calcolo
 
 ## Come si usa
